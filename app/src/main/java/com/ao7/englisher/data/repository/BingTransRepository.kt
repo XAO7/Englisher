@@ -2,6 +2,7 @@ package com.ao7.englisher.data.repository
 
 import android.util.Log
 import com.ao7.englisher.network.BingTransService
+import com.ao7.englisher.ui.viewmodel.BrowseResult
 import com.ao7.englisher.ui.viewmodel.BrowseUiState
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -13,7 +14,7 @@ import retrofit2.Response
 
 class BingTransRepository(val bingTransService: BingTransService) : TransRepository {
 
-	override fun browse(text: String): Flow<BrowseUiState> = callbackFlow {
+	override fun browse(text: String): Flow<BrowseResult> = callbackFlow {
 		if (text != "") {
 			bingTransService.translate(text).enqueue(
 				object : Callback<String> {
@@ -35,7 +36,7 @@ class BingTransRepository(val bingTransService: BingTransService) : TransReposit
 							}
 						}
 
-						trySend(BrowseUiState(phonic, translations))
+						trySend(BrowseResult(phonic, translations))
 					}
 
 					override fun onFailure(call: Call<String>, t: Throwable) {

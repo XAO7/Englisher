@@ -1,5 +1,6 @@
 package com.ao7.englisher.ui.viewmodel
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ao7.englisher.AppEvent
@@ -7,7 +8,6 @@ import com.ao7.englisher.data.Word
 import com.ao7.englisher.data.repository.TransRepository
 import com.ao7.englisher.data.repository.WordsRepository
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -21,15 +21,25 @@ class BrowseViewModel(
 	private val wordsRepository: WordsRepository
 ) : ViewModel() {
 
-	private val _browseWord = MutableStateFlow("")
+	var b = mutableStateOf("")
 
-	@OptIn(ExperimentalCoroutinesApi::class)
-	val browseUiState = _browseWord.flatMapLatest {
+	private val _browseWord = MutableStateFlow("")
+	private val _browseUiState = MutableStateFlow(BrowseUiState(browseResult = BrowseResult()))
+	private val _browseResult = _browseWord.flatMapLatest {
 		transRepository.browse(it)
+	}
+
+	val browseUiState = combine(_browseUiState, _browseResult, _browseWord) { state, result, word ->
+		state.copy(
+			browseResult = result,
+			browseWord = word
+		)
 	}.stateIn(
 		scope = viewModelScope,
 		started = SharingStarted.WhileSubscribed(5000L),
-		initialValue = BrowseUiState()
+		initialValue = BrowseUiState(
+			browseResult = BrowseResult()
+		)
 	)
 
 	fun insertWord(word: Word) {
@@ -51,6 +61,11 @@ class BrowseViewModel(
 }
 
 data class BrowseUiState(
+	val browseResult: BrowseResult,
+	val browseWord: String = ""
+)
+
+data class BrowseResult(
 	val phonic: String? = null,
 	val translations: List<String> = listOf()
 )

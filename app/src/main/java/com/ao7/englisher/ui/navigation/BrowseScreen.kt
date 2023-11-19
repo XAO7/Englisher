@@ -12,12 +12,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.AddCircle
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -25,7 +22,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -34,22 +30,20 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ao7.englisher.AppEvent
 import com.ao7.englisher.data.Word
-import com.ao7.englisher.ui.viewmodel.BrowseUiState
 import com.ao7.englisher.ui.viewmodel.BrowseViewModel
 
 @Composable
 fun BrowseScreen(
 	browseViewModel: BrowseViewModel
 ) {
-	var browseWord by remember { mutableStateOf("") }
 	val browseUiState = browseViewModel.browseUiState.collectAsState()
+	var b by remember { browseViewModel.b }
 
 	var translation by remember { mutableStateOf("") }
 
@@ -61,9 +55,9 @@ fun BrowseScreen(
 				modifier = Modifier.padding(10.dp)
 			) {
 				OutlinedTextField(
-					value = browseWord,
+					value = b,
 					onValueChange = {
-						browseWord = it
+						b = it
 					},
 					modifier = Modifier
 						.weight(1f)
@@ -74,7 +68,7 @@ fun BrowseScreen(
 				)
 				Spacer(modifier = Modifier.width(10.dp))
 				Button(
-					onClick = { browseViewModel.onEvent(AppEvent.BrowseWord(browseWord)) },
+					onClick = { browseViewModel.onEvent(AppEvent.BrowseWord(b)) },
 					shape = MaterialTheme.shapes.medium,
 					contentPadding = PaddingValues(0.dp, 10.dp)
 				) {
@@ -86,10 +80,10 @@ fun BrowseScreen(
 			modifier = Modifier.fillMaxSize()
 		) {
 			Column {
-				if (browseUiState.value.phonic != null) {
-					Phonic(phonicText = browseUiState.value.phonic!!)
+				if (browseUiState.value.browseResult.phonic != null) {
+					Phonic(phonicText = browseUiState.value.browseResult.phonic!!)
 				}
-				browseUiState.value.translations.forEach {
+				browseUiState.value.browseResult.translations.forEach {
 					Translation(transText = it)
 				}
 
@@ -115,7 +109,7 @@ fun BrowseScreen(
 					Button(
 						onClick = {
 							browseViewModel.onEvent(AppEvent.AddWord(Word(
-								origin = browseWord,
+								origin = b,
 								translation = translation
 							)))
 						},
