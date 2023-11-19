@@ -130,6 +130,10 @@ fun WordEntry(
 			) {
 				Text(
 					modifier = Modifier.padding(20.dp),
+					text = word.phonic
+				)
+				Text(
+					modifier = Modifier.padding(20.dp),
 					text = word.translation
 				)
 			}

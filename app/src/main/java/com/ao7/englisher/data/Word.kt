@@ -9,5 +9,5 @@ data class Word(
 	val id: Int? = null,
 	val origin: String = "",
 	val translation: String = "",
-	val pronunciation: String = ""
+	val phonic: String = ""
 )

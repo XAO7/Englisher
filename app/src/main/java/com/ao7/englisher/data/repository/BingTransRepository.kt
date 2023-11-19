@@ -23,8 +23,12 @@ class BingTransRepository(val bingTransService: BingTransService) : TransReposit
 						var translations = mutableListOf<String>()
 						val document = Jsoup.parse(htmlString)
 
-						val phonic = document.selectFirst("body > div.contentPadding > div > div > div.lf_area > div.qdef > div.hd_area > div.hd_tf_lh > div > div.hd_prUS.b_primtxt")
+						val _phonic = document.selectFirst("body > div.contentPadding > div > div > div.lf_area > div.qdef > div.hd_area > div.hd_tf_lh > div > div.hd_prUS.b_primtxt")
 							?.text()
+						var phonic = ""
+						if (_phonic != null) {
+							phonic = _phonic
+						}
 
 						repeat(8) {
 							val element = document

@@ -66,6 +66,6 @@ data class BrowseUiState(
 )
 
 data class BrowseResult(
-	val phonic: String? = null,
+	val phonic: String = "",
 	val translations: List<String> = listOf()
 )

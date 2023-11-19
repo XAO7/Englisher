@@ -16,7 +16,7 @@ abstract class EnglisherDatabase : RoomDatabase() {
 		private var Instance: EnglisherDatabase? = null
 
 		fun getDatabase(context: Context) : EnglisherDatabase{
-			Log.d("ao", "getDatabase called")
+			Log.d("DDD", "getDatabase called")
 
 			return Instance ?: synchronized(this) {
 				Room.databaseBuilder(context, EnglisherDatabase::class.java, "word_database")

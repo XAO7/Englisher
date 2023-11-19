@@ -80,8 +80,8 @@ fun BrowseScreen(
 			modifier = Modifier.fillMaxSize()
 		) {
 			Column {
-				if (browseUiState.value.browseResult.phonic != null) {
-					Phonic(phonicText = browseUiState.value.browseResult.phonic!!)
+				if (browseUiState.value.browseResult.phonic != "") {
+					Phonic(phonicText = browseUiState.value.browseResult.phonic)
 				}
 				browseUiState.value.browseResult.translations.forEach {
 					Translation(transText = it)
@@ -110,6 +110,7 @@ fun BrowseScreen(
 						onClick = {
 							browseViewModel.onEvent(AppEvent.AddWord(Word(
 								origin = b,
+								phonic = browseUiState.value.browseResult.phonic,
 								translation = translation
 							)))
 						},
