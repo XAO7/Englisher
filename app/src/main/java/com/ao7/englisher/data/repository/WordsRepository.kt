@@ -9,5 +9,6 @@ interface WordsRepository {
 	fun insertWord(word: Word)
 	fun insertWords(wordList: List<Word>)
 	fun deleteAllWords()
-	fun deleteWord(origin: String)
+	fun deleteWord(word: Word)
+	fun updateWord(word: Word)
 }

@@ -16,12 +16,11 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
@@ -96,9 +95,15 @@ class LibraryViewModel(
 		}
 	}
 
-	fun deleteWord(origin: String) {
+	fun deleteWord(word: Word) {
 		GlobalScope.launch(Dispatchers.IO) {
-			wordsRepository.deleteWord(origin)
+			wordsRepository.deleteWord(word)
+		}
+	}
+
+	fun updateWord(word: Word) {
+		GlobalScope.launch(Dispatchers.IO) {
+			wordsRepository.updateWord(word)
 		}
 	}
 
@@ -107,6 +112,26 @@ class LibraryViewModel(
 			is AppEvent.SearchWordChanged -> {
 				_searchWord.value = event.searchWord
 			}
+
+
+			is AppEvent.EditWord -> {
+				_libraryUiState.update {
+					it.copy(
+						isEditingWord = true,
+						editingWord = event.word
+					)
+				}
+			}
+			is AppEvent.HideEditWordDialog -> {
+				_libraryUiState.update { it.copy(isEditingWord = false) }
+			}
+			is AppEvent.DeleteEditingWord -> {
+				deleteWord(libraryUiState.value.editingWord)
+			}
+			is AppEvent.UpdateEditingWord -> {
+				updateWord(event.word)
+			}
+
 			is AppEvent.ImportTxt -> {
 				deleteAllWords()
 				openFile(startForImportResult, "/sdcard/Documents".toUri())
@@ -152,5 +177,7 @@ class LibraryViewModel(
 
 data class LibraryUiState(
 	val words: List<Word> = listOf(),
-	val searchWord: String = ""
+	val searchWord: String = "",
+	val isEditingWord: Boolean = false,
+	val editingWord: Word = Word()
 )

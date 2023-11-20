@@ -22,7 +22,11 @@ class LocalWordsRepository(private val wordDao: WordDao) : WordsRepository {
 		wordDao.deleteAllWords()
 	}
 
-	override fun deleteWord(origin: String) {
-		wordDao.deleteWord(origin)
+	override fun deleteWord(word: Word) {
+		wordDao.deleteWord(word)
+	}
+
+	override fun updateWord(word: Word) {
+		wordDao.updateWord(word)
 	}
 }

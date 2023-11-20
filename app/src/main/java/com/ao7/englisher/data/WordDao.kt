@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
+import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -24,6 +25,9 @@ interface WordDao {
 	@Query("DELETE FROM Library")
 	fun deleteAllWords()
 
-	@Query("DELETE FROM Library WHERE origin = :origin")
-	fun deleteWord(origin: String)
+	@Delete
+	fun deleteWord(word: Word)
+
+	@Update
+	fun updateWord(word: Word)
 }
