@@ -98,11 +98,12 @@ class MainActivity : ComponentActivity() {
 
 	private fun linesToWords(lines: List<String>, wordList: MutableList<Word>) {
 		lines.forEach {
-			val parts = it.split(" ")
+			val parts = it.split("/")
 			wordList.add(
 				Word(
-				origin = parts[0],
-				translation = if (parts.size > 1) parts[1] else ""
+					origin = parts[0],
+					phonic = if (parts.size > 1) parts[1] else "",
+					translation = if (parts.size > 2) parts[2] else ""
 				)
 			)
 		}
@@ -111,7 +112,7 @@ class MainActivity : ComponentActivity() {
 	private fun wordsToString(words: List<Word>): String {
 		var string = ""
 		words.forEach {
-			string += it.origin + " " + it.translation + "\n"
+			string += it.origin + "/" + it.phonic + "/" + it.translation + "\n"
 		}
 		return string
 	}

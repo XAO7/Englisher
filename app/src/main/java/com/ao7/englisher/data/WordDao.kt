@@ -14,7 +14,7 @@ interface WordDao {
 	@Query("SELECT * FROM Library ORDER BY origin")
 	fun getAllWords(): Flow<List<Word>>
 
-	@Query("SELECT * FROM Library WHERE origin LIKE :searchWord ORDER BY origin")
+	@Query("SELECT * FROM Library WHERE origin LIKE :searchWord OR translation LIKE :searchWord ORDER BY origin")
 	fun getWords(searchWord: String): Flow<List<Word>>
 
 	@Insert

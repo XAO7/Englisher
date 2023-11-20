@@ -70,7 +70,7 @@ fun BrowseScreen(
 					onValueChange = {
 						b = it
 					},
-					placeholder = { Text(text = "Search word")},
+					placeholder = { Text(text = "Search word", color = Color.Gray) },
 					modifier = Modifier
 						.weight(1f),
 					keyboardOptions = KeyboardOptions.Default.copy(
@@ -150,7 +150,7 @@ fun BrowseScreen(
 				) {
 					OutlinedTextField(
 						value = translation,
-						placeholder = { Text(text = "Type translation")},
+						placeholder = { Text(text = "Type translation", color = Color.Gray)},
 						onValueChange = {
 							translation = it
 						},

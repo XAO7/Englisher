@@ -40,16 +40,13 @@ class LibraryViewModel(
 //			)
 
 	private val _libraryUiState = MutableStateFlow(LibraryUiState())
-
-	private val _searchWord = MutableStateFlow("")
-
-	private val _words = _searchWord.flatMapLatest {
+	val searchWord = MutableStateFlow("")
+	private val _words = searchWord.flatMapLatest {
 //		if (it.equals("")) {
 //			MutableStateFlow<List<Word>>(listOf())
 //		} else {
 //			wordsRepository.getWords("%$it%")
 //		}
-
 		wordsRepository.getWords("%$it%")
 	}.stateIn(
 		scope = viewModelScope,
@@ -57,10 +54,11 @@ class LibraryViewModel(
 		initialValue = emptyList()
 	)
 
-	val libraryUiState = combine(_libraryUiState, _searchWord, _words) { state, searchWord, words ->
+	val libraryUiState = combine(_libraryUiState, searchWord, _words) { state, searchWord, words ->
 		state.copy(
 			searchWord = searchWord,
-			words = words
+			words = words,
+			matchedCount = words.size
 		)
 	}.stateIn(
 		scope = viewModelScope,
@@ -109,11 +107,6 @@ class LibraryViewModel(
 
 	fun onEvent(event: AppEvent) {
 		when (event) {
-			is AppEvent.SearchWordChanged -> {
-				_searchWord.value = event.searchWord
-			}
-
-
 			is AppEvent.EditWord -> {
 				_libraryUiState.update {
 					it.copy(
@@ -179,5 +172,6 @@ data class LibraryUiState(
 	val words: List<Word> = listOf(),
 	val searchWord: String = "",
 	val isEditingWord: Boolean = false,
-	val editingWord: Word = Word()
+	val editingWord: Word = Word(),
+	val matchedCount: Int = 0
 )
