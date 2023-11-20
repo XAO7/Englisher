@@ -11,4 +11,5 @@ interface WordsRepository {
 	fun deleteAllWords()
 	fun deleteWord(word: Word)
 	fun updateWord(word: Word)
+	fun getWordCount(origin: String): Flow<Int>
 }

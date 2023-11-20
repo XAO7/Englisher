@@ -1,5 +1,6 @@
 package com.ao7.englisher.ui.viewmodel
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,6 +14,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -28,11 +30,17 @@ class BrowseViewModel(
 	private val _browseResult = _browseWord.flatMapLatest {
 		transRepository.browse(it)
 	}
+	private val _browseWordInLibrary = _browseResult.flatMapLatest {
+		wordsRepository.getWordCount(it.origin).map { count ->
+			count > 0
+		}
+	}
 
-	val browseUiState = combine(_browseUiState, _browseResult, _browseWord) { state, result, word ->
+	val browseUiState = combine(_browseUiState, _browseResult, _browseWord, _browseWordInLibrary) { state, result, word, inLibrary ->
 		state.copy(
 			browseResult = result,
-			browseWord = word
+			browseWord = word,
+			canAddWord = !inLibrary
 		)
 	}.stateIn(
 		scope = viewModelScope,
@@ -62,10 +70,13 @@ class BrowseViewModel(
 
 data class BrowseUiState(
 	val browseResult: BrowseResult,
-	val browseWord: String = ""
+	val browseWord: String = "",
+	val canAddWord: Boolean = false
 )
 
 data class BrowseResult(
+	val success: Boolean = false,
+	val origin: String = "",
 	val phonic: String = "",
 	val translations: List<String> = listOf()
 )

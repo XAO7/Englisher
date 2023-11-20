@@ -30,17 +30,23 @@ class BingTransRepository(val bingTransService: BingTransService) : TransReposit
 							phonic = _phonic
 						}
 
+						val _origin = document.selectFirst("#headword > h1 > strong")
+							?.text()
+						var origin = ""
+						if (_origin != null) {
+							origin = _origin
+						}
+
 						repeat(8) {
 							val element = document
 								.selectFirst("body > div.contentPadding > div > div > div.lf_area > div.qdef > ul > li:nth-child($it) > span.def.b_regtxt > span")
 
 							if (element != null) {
 								translations.add(element.text())
-								Log.d("DDD", element.text())
 							}
 						}
 
-						trySend(BrowseResult(phonic, translations))
+						trySend(BrowseResult(translations.isNotEmpty(), origin, phonic, translations))
 					}
 
 					override fun onFailure(call: Call<String>, t: Throwable) {

@@ -1,5 +1,6 @@
 package com.ao7.englisher.data
 
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
@@ -30,4 +31,7 @@ interface WordDao {
 
 	@Update
 	fun updateWord(word: Word)
+
+	@Query("SELECT COUNT(*) FROM Library WHERE origin = :origin")
+	fun getWordCount(origin: String): Flow<Int>
 }

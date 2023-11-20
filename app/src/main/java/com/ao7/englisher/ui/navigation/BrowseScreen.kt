@@ -1,5 +1,10 @@
 package com.ao7.englisher.ui.navigation
 
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -28,16 +33,20 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ao7.englisher.AppEvent
 import com.ao7.englisher.data.Word
+import com.ao7.englisher.ui.theme.Pink40
 import com.ao7.englisher.ui.viewmodel.BrowseViewModel
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun BrowseScreen(
 	browseViewModel: BrowseViewModel
@@ -46,6 +55,8 @@ fun BrowseScreen(
 	var b by remember { browseViewModel.b }
 
 	var translation by remember { mutableStateOf("") }
+
+	val controller = LocalSoftwareKeyboardController.current
 
 	Column(
 	) {
@@ -59,16 +70,21 @@ fun BrowseScreen(
 					onValueChange = {
 						b = it
 					},
+					placeholder = { Text(text = "Search word")},
 					modifier = Modifier
-						.weight(1f)
-						.height(50.dp),
+						.weight(1f),
 					keyboardOptions = KeyboardOptions.Default.copy(
 						imeAction = ImeAction.Done
-					)
+					),
+					singleLine = true
 				)
 				Spacer(modifier = Modifier.width(10.dp))
 				Button(
-					onClick = { browseViewModel.onEvent(AppEvent.BrowseWord(b)) },
+					onClick = {
+						browseViewModel.onEvent(AppEvent.BrowseWord(b))
+						controller?.hide()
+						translation = ""
+					},
 					shape = MaterialTheme.shapes.medium,
 					contentPadding = PaddingValues(0.dp, 10.dp)
 				) {
@@ -76,8 +92,47 @@ fun BrowseScreen(
 				}
 			}
 		}
+
+		if (browseUiState.value.browseResult.success) {
+			Box(
+				modifier = Modifier
+					.fillMaxWidth()
+					.height(65.dp),
+				contentAlignment = Alignment.Center
+			) {
+				Text(
+					text = browseUiState.value.browseResult.origin,
+					fontSize = 40.sp,
+					fontWeight = FontWeight.Bold
+				)
+			}
+			if (!browseUiState.value.canAddWord) {
+				Box(
+					modifier = Modifier
+						.fillMaxWidth()
+						.height(30.dp)
+						.background(color = Pink40),
+					contentAlignment = Alignment.Center,
+				) {
+					Text(
+						text = "Already in library",
+						fontSize = 20.sp,
+						fontWeight = FontWeight.Bold,
+						color = Color.White
+					)
+				}
+			}
+		}
+
 		Card(
-			modifier = Modifier.fillMaxSize()
+			modifier = Modifier
+				.fillMaxSize()
+				.animateContentSize(
+					animationSpec = spring(
+						dampingRatio = Spring.DampingRatioNoBouncy,
+						stiffness = Spring.StiffnessMedium,
+					)
+				)
 		) {
 			Column {
 				if (browseUiState.value.browseResult.phonic != "") {
@@ -95,27 +150,31 @@ fun BrowseScreen(
 				) {
 					OutlinedTextField(
 						value = translation,
+						placeholder = { Text(text = "Type translation")},
 						onValueChange = {
 							translation = it
 						},
 						modifier = Modifier
-							.weight(1f)
-							.height(50.dp),
+							.weight(1f),
 						keyboardOptions = KeyboardOptions.Default.copy(
 							imeAction = ImeAction.Done
-						)
+						),
+						singleLine = true
 					)
 					Spacer(modifier = Modifier.width(10.dp))
 					Button(
 						onClick = {
 							browseViewModel.onEvent(AppEvent.AddWord(Word(
-								origin = b,
+								origin = browseUiState.value.browseResult.origin,
 								phonic = browseUiState.value.browseResult.phonic,
 								translation = translation
 							)))
+							controller?.hide()
+							translation = ""
 						},
 						shape = MaterialTheme.shapes.medium,
-						contentPadding = PaddingValues(0.dp, 10.dp)
+						contentPadding = PaddingValues(0.dp, 10.dp),
+						enabled = browseUiState.value.canAddWord && translation.isNotEmpty()
 					) {
 						Icon(imageVector = Icons.Filled.Add, contentDescription = null)
 					}
@@ -141,7 +200,7 @@ fun Phonic(
 			Text(
 				text = phonicText,
 				modifier = Modifier.padding(20.dp, 0.dp),
-				fontSize = 40.sp,
+				fontSize = 30.sp,
 				fontWeight = FontWeight.Bold
 			)
 		}

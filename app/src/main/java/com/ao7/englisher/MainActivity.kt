@@ -120,7 +120,6 @@ class MainActivity : ComponentActivity() {
 		try {
 			contentResolver.openFileDescriptor(uri, "w")?.use {
 				FileOutputStream(it.fileDescriptor).use { stream ->
-					Log.d("DDD", string)
 					stream.write(
 						string.toByteArray()
 					)

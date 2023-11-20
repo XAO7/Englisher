@@ -29,4 +29,8 @@ class LocalWordsRepository(private val wordDao: WordDao) : WordsRepository {
 	override fun updateWord(word: Word) {
 		wordDao.updateWord(word)
 	}
+
+	override fun getWordCount(origin: String): Flow<Int> {
+		return wordDao.getWordCount(origin)
+	}
 }

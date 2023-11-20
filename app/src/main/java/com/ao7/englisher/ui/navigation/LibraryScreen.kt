@@ -82,9 +82,10 @@ fun LibraryScreen(
 						searchWord = it
 						libraryViewModel.onEvent(AppEvent.SearchWordChanged(it))
 					},
+					placeholder = { Text(text = "Search library")},
+					singleLine = true,
 					modifier = Modifier
-						.weight(1f)
-						.height(50.dp),
+						.weight(1f),
 					keyboardOptions = KeyboardOptions.Default.copy(
 						imeAction = ImeAction.Done
 					)
@@ -123,7 +124,7 @@ fun WordEntry(
 					dampingRatio = Spring.DampingRatioNoBouncy,
 					stiffness = Spring.StiffnessMedium,
 				)
-			)
+			),
 	) {
 		Row(
 			verticalAlignment = Alignment.CenterVertically,
@@ -220,9 +221,9 @@ fun EditWordDialog(
 					fontSize = 30.sp,
 					modifier = Modifier.padding(0.dp, 5.dp)
 				)
-				EditTextField(editOrigin)
-				EditTextField(editPhonic)
-				EditTextField(editTranslation)
+				EditTextField(editOrigin, "Origin")
+				EditTextField(editPhonic, "Phonic")
+				EditTextField(editTranslation, "Translation")
 				Spacer(modifier = Modifier.height(20.dp))
 				Row(
 					modifier = Modifier.fillMaxWidth()
@@ -254,13 +255,19 @@ fun EditWordDialog(
 
 @Composable
 fun EditTextField(
-	editState: MutableState<String>
+	editState: MutableState<String>,
+	placeholder: String
 ) {
 	TextField(
 		modifier = Modifier.padding(0.dp, 5.dp),
 		colors = TextFieldDefaults.colors(
 			focusedContainerColor = Color.White,
 		),
+		placeholder = {
+			Text(text = placeholder)
+		},
+		singleLine = true,
+		keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
 		value = editState.value,
 		onValueChange = { editState.value = it }
 	)
