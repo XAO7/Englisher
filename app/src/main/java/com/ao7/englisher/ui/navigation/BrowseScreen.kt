@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ao7.englisher.AppEvent
 import com.ao7.englisher.data.Word
+import com.ao7.englisher.getOriginType
 import com.ao7.englisher.ui.theme.Pink40
 import com.ao7.englisher.ui.viewmodel.BrowseViewModel
 
@@ -60,7 +61,9 @@ fun BrowseScreen(
 
 	Column(
 	) {
-		Surface {
+		Surface(
+			shadowElevation = 5.dp
+		) {
 			Row(
 				verticalAlignment = Alignment.CenterVertically,
 				modifier = Modifier.padding(10.dp)
@@ -167,7 +170,10 @@ fun BrowseScreen(
 							browseViewModel.onEvent(AppEvent.AddWord(Word(
 								origin = browseUiState.value.browseResult.origin,
 								phonic = browseUiState.value.browseResult.phonic,
-								translation = translation
+								translation = translation,
+								language = "EN",
+								type = getOriginType(browseUiState.value.browseResult.origin),
+								addTime = System.currentTimeMillis()
 							)))
 							controller?.hide()
 							translation = ""

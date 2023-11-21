@@ -10,9 +10,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.sqlite.db.SimpleSQLiteQuery
 import com.ao7.englisher.AppEvent
-import com.ao7.englisher.SortOptions
-import com.ao7.englisher.SortOrder
-import com.ao7.englisher.SortType
+import com.ao7.englisher.data.SortOptions
+import com.ao7.englisher.data.SortOrder
+import com.ao7.englisher.data.SortType
 import com.ao7.englisher.data.Word
 import com.ao7.englisher.data.repository.WordsRepository
 import kotlinx.coroutines.Dispatchers
@@ -36,7 +36,11 @@ class LibraryViewModel(
 	val searchWord = MutableStateFlow("")
 
 	private val _words = combine(_libraryUiState, searchWord){_, _ ->}.flatMapLatest {
-		wordsRepository.getWords(SimpleSQLiteQuery("SELECT * FROM Library WHERE origin LIKE \"%${searchWord.value}%\" OR translation LIKE \"%${searchWord.value}%\" ORDER BY ${_libraryUiState.value.sortOptions.sortType.columnName} ${_libraryUiState.value.sortOptions.sortOrder.sortKeyword}"))
+		wordsRepository.getWords(
+			SimpleSQLiteQuery(
+				"SELECT * FROM Library WHERE origin LIKE \"%${searchWord.value}%\" OR translation LIKE \"%${searchWord.value}%\" ORDER BY ${_libraryUiState.value.sortOptions.sortType.columnName} ${_libraryUiState.value.sortOptions.sortOrder.sortKeyword}"
+			)
+		)
 	}.stateIn(
 		scope = viewModelScope,
 		started = SharingStarted.WhileSubscribed(5000L),

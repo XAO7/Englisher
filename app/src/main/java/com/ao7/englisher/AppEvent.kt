@@ -1,5 +1,6 @@
 package com.ao7.englisher
 
+import com.ao7.englisher.data.SortOptions
 import com.ao7.englisher.data.Word
 
 interface AppEvent {

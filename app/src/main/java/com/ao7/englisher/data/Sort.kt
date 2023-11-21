@@ -1,10 +1,8 @@
-package com.ao7.englisher
-
-import androidx.compose.ui.text.toLowerCase
+package com.ao7.englisher.data
 
 enum class SortType {
 	ORIGIN("origin"),
-	ADDTIME("id");
+	ADDTIME("addTime");
 
 	val columnName: String
 
@@ -28,3 +26,8 @@ data class SortOptions(
 	val sortType: SortType,
 	val sortOrder: SortOrder
 )
+
+enum class WordType {
+	WORD,
+	PHRASE
+}
