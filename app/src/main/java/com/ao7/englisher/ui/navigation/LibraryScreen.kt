@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Edit
@@ -50,14 +51,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ao7.englisher.AppEvent
-import com.ao7.englisher.SortOptions
-import com.ao7.englisher.SortOrder
-import com.ao7.englisher.SortType
+import com.ao7.englisher.data.SortOrder
+import com.ao7.englisher.data.SortType
 import com.ao7.englisher.data.Word
 import com.ao7.englisher.ui.theme.Pink40
 import com.ao7.englisher.ui.theme.Pink80
@@ -80,7 +79,9 @@ fun LibraryScreen(
 
 	Column(
 	) {
-		Surface {
+		Surface(
+			shadowElevation = 5.dp
+		) {
 			Row(
 				verticalAlignment = Alignment.CenterVertically,
 				modifier = Modifier.padding(10.dp)
@@ -112,9 +113,10 @@ fun LibraryScreen(
 			}
 		}
 		LazyColumn() {
-			items(libraryUiState.value.words) {
+			itemsIndexed(libraryUiState.value.words) { index, it ->
+				if (index == 0)
+					Spacer(modifier = Modifier.height(8.dp))
 				WordEntry(libraryViewModel, it)
-//				Log.d("Library", it.origin)
 			}
 		}
 	}

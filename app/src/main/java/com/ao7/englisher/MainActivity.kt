@@ -14,6 +14,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ao7.englisher.data.Word
+import com.ao7.englisher.data.WordType
 import com.ao7.englisher.ui.viewmodel.LibraryViewModel
 import com.ao7.englisher.ui.viewmodel.AppViewModelProvider
 import com.ao7.englisher.ui.viewmodel.BrowseViewModel
@@ -103,7 +104,10 @@ class MainActivity : ComponentActivity() {
 				Word(
 					origin = parts[0],
 					phonic = if (parts.size > 1) parts[1] else "",
-					translation = if (parts.size > 2) parts[2] else ""
+					translation = if (parts.size > 2) parts[2] else "",
+					language = if (parts.size > 3 && parts[3] != "") parts[3] else "EN",
+					type = if (parts.size > 4 && parts[4] != "") parts[4] else getOriginType(parts[0]),
+					addTime = if (parts.size > 5 && parts[5] != "") parts[5].toLong() else System.nanoTime(),
 				)
 			)
 		}
@@ -112,7 +116,7 @@ class MainActivity : ComponentActivity() {
 	private fun wordsToString(words: List<Word>): String {
 		var string = ""
 		words.forEach {
-			string += it.origin + "/" + it.phonic + "/" + it.translation + "\n"
+			string += it.origin + "/" + it.phonic + "/" + it.translation + "/" + it.type + "/" + it.language + "/" + it.addTime + "\n"
 		}
 		return string
 	}

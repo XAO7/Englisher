@@ -9,5 +9,8 @@ data class Word(
 	val id: Int? = null,
 	val origin: String = "",
 	val translation: String = "",
-	val phonic: String = ""
+	val phonic: String = "",
+	val language: String = "EN",
+	val type: String = "",
+	val addTime: Long = 0L
 )
