@@ -28,11 +28,13 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
+import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -53,6 +55,9 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ao7.englisher.AppEvent
+import com.ao7.englisher.SortOptions
+import com.ao7.englisher.SortOrder
+import com.ao7.englisher.SortType
 import com.ao7.englisher.data.Word
 import com.ao7.englisher.ui.theme.Pink40
 import com.ao7.englisher.ui.theme.Pink80
@@ -67,6 +72,10 @@ fun LibraryScreen(
 
 	if (libraryUiState.value.isEditingWord) {
 		EditWordDialog(libraryViewModel, libraryUiState)
+	}
+
+	if (libraryUiState.value.isChangingSort) {
+		SortDialog(libraryViewModel, libraryUiState)
 	}
 
 	Column(
@@ -94,7 +103,7 @@ fun LibraryScreen(
 				)
 				Spacer(modifier = Modifier.width(10.dp))
 				Button(
-					onClick = {  },
+					onClick = { libraryViewModel.onEvent(AppEvent.OpenSortDialog) },
 					shape = MaterialTheme.shapes.medium,
 					contentPadding = PaddingValues(0.dp, 10.dp)
 				) {
@@ -301,5 +310,76 @@ fun RowScope.EditButton(
 				fontSize = 18.sp
 			)
 		}
+	}
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun SortDialog(
+	libraryViewModel: LibraryViewModel,
+	libraryUiState: State<LibraryUiState>
+) {
+	AlertDialog(
+		onDismissRequest = { libraryViewModel.onEvent(AppEvent.HideSortDialog) },
+		modifier = Modifier
+			.fillMaxWidth(0.95f)
+	) {
+		Card(
+		) {
+			Column(
+				modifier = Modifier
+					.padding(20.dp),
+				horizontalAlignment = Alignment.CenterHorizontally,
+				verticalArrangement = Arrangement.Center
+			) {
+				Row {
+					enumValues<SortType>().forEach {
+						SortRadioButton(
+							text = it.name, selected = libraryUiState.value.sortOptions.sortType == it
+						) {
+							libraryViewModel.onEvent(
+								AppEvent.ChangeSortOptions(libraryUiState.value.sortOptions.copy(
+									sortType = it
+								))
+							)
+						}
+					}
+				}
+				Divider()
+				Row {
+					enumValues<SortOrder>().forEach {
+						SortRadioButton(
+							text = it.name, selected = libraryUiState.value.sortOptions.sortOrder == it
+						) {
+							libraryViewModel.onEvent(
+								AppEvent.ChangeSortOptions(libraryUiState.value.sortOptions.copy(
+									sortOrder = it
+								))
+							)
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+@Composable
+fun SortRadioButton(
+	text: String,
+	selected: Boolean,
+	onClick: () -> Unit
+) {
+	Row(
+		verticalAlignment = Alignment.CenterVertically,
+		modifier = Modifier.padding(5.dp)
+	) {
+		Text(
+			text = text
+		)
+		RadioButton(
+			selected = selected,
+			onClick = onClick
+		)
 	}
 }

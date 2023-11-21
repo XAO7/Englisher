@@ -8,7 +8,11 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.sqlite.db.SimpleSQLiteQuery
 import com.ao7.englisher.AppEvent
+import com.ao7.englisher.SortOptions
+import com.ao7.englisher.SortOrder
+import com.ao7.englisher.SortType
 import com.ao7.englisher.data.Word
 import com.ao7.englisher.data.repository.WordsRepository
 import kotlinx.coroutines.Dispatchers
@@ -28,26 +32,11 @@ class LibraryViewModel(
 	private val wordsRepository: WordsRepository,
 ) : ViewModel() {
 
-//	var libraryUiState: StateFlow<LibraryUiState> =
-//		wordsRepository.getAllWords()
-//			.map {
-//			LibraryUiState(it)
-//			}
-//			.stateIn(
-//			scope = viewModelScope,
-//			started = SharingStarted.WhileSubscribed(5000L),
-//			initialValue = LibraryUiState()
-//			)
-
 	private val _libraryUiState = MutableStateFlow(LibraryUiState())
 	val searchWord = MutableStateFlow("")
-	private val _words = searchWord.flatMapLatest {
-//		if (it.equals("")) {
-//			MutableStateFlow<List<Word>>(listOf())
-//		} else {
-//			wordsRepository.getWords("%$it%")
-//		}
-		wordsRepository.getWords("%$it%")
+
+	private val _words = combine(_libraryUiState, searchWord){_, _ ->}.flatMapLatest {
+		wordsRepository.getWords(SimpleSQLiteQuery("SELECT * FROM Library WHERE origin LIKE \"%${searchWord.value}%\" OR translation LIKE \"%${searchWord.value}%\" ORDER BY ${_libraryUiState.value.sortOptions.sortType.columnName} ${_libraryUiState.value.sortOptions.sortOrder.sortKeyword}"))
 	}.stateIn(
 		scope = viewModelScope,
 		started = SharingStarted.WhileSubscribed(5000L),
@@ -125,6 +114,16 @@ class LibraryViewModel(
 				updateWord(event.word)
 			}
 
+			is AppEvent.OpenSortDialog -> {
+				_libraryUiState.update { it.copy(isChangingSort = true) }
+			}
+			is AppEvent.HideSortDialog -> {
+				_libraryUiState.update { it.copy(isChangingSort = false) }
+			}
+			is AppEvent.ChangeSortOptions -> {
+				_libraryUiState.update { it.copy(sortOptions = event.sortOptions) }
+			}
+
 			is AppEvent.ImportTxt -> {
 				deleteAllWords()
 				openFile(startForImportResult, "/sdcard/Documents".toUri())
@@ -173,5 +172,8 @@ data class LibraryUiState(
 	val searchWord: String = "",
 	val isEditingWord: Boolean = false,
 	val editingWord: Word = Word(),
-	val matchedCount: Int = 0
+	val matchedCount: Int = 0,
+
+	val isChangingSort: Boolean = false,
+	val sortOptions: SortOptions = SortOptions(SortType.ORIGIN, SortOrder.ASCEND),
 )
