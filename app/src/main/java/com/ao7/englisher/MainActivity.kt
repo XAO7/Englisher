@@ -27,6 +27,7 @@ import java.io.FileNotFoundException
 import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStreamReader
+import kotlin.math.pow
 
 class MainActivity : ComponentActivity() {
 
@@ -98,7 +99,9 @@ class MainActivity : ComponentActivity() {
 	}
 
 	private fun linesToWords(lines: List<String>, wordList: MutableList<Word>) {
+		var baseTime = System.currentTimeMillis() * 1000000
 		lines.forEach {
+			val t = System.nanoTime()
 			val parts = it.split("/")
 			wordList.add(
 				Word(
@@ -107,9 +110,10 @@ class MainActivity : ComponentActivity() {
 					translation = if (parts.size > 2) parts[2] else "",
 					language = if (parts.size > 3 && parts[3] != "") parts[3] else "EN",
 					type = if (parts.size > 4 && parts[4] != "") parts[4] else getOriginType(parts[0]),
-					addTime = if (parts.size > 5 && parts[5] != "") parts[5].toLong() else System.nanoTime(),
+					addTime = if (parts.size > 5 && parts[5] != "") parts[5].toLong() else (System.nanoTime() - t + baseTime),
 				)
 			)
+			baseTime += System.nanoTime() - t
 		}
 	}
 

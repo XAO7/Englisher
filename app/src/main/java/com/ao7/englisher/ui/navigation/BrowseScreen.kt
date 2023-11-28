@@ -173,7 +173,7 @@ fun BrowseScreen(
 								translation = translation,
 								language = "EN",
 								type = getOriginType(browseUiState.value.browseResult.origin),
-								addTime = System.nanoTime()
+								addTime = System.currentTimeMillis() * 1000000
 							)))
 							controller?.hide()
 							translation = ""
